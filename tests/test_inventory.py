@@ -117,15 +117,15 @@ class TestInventory:
         button_login.click()
 
         #проваливаемся в карточку товара
-        open_item = page.locator('img[inventory-item-sauce-labs-backpack-img]')
+        open_item = page.locator('img[data-test="inventory-item-sauce-labs-backpack-img"]')
         open_item.click()
 
         #общие проверки страницы товара
         expect(page).to_have_url(f'{BASE_URL}inventory-item.html?id=4')
-        expect(page.locator('.inventory_details_name large_size')).to_have_text('Sauce Labs Backpack')
+        expect(page.locator('.inventory_details_name.large_size')).to_have_text('Sauce Labs Backpack')
         expect(page.locator('.inventory_details_price')).to_have_text('$29.99')
-        expect(page.locator('.inventory_details_desc large_size')).to_have_text('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')
-        expect(page.locator('.btn btn_primary btn_small btn_inventory')).to_be_visible()
+        expect(page.locator('.inventory_details_desc.large_size')).to_have_text('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')
+        expect(page.locator('.btn.btn_primary.btn_small.btn_inventory')).to_be_visible()
 
         #добавляем товар в корзину
         add_to_cart = page.locator('#add-to-cart')
@@ -140,10 +140,33 @@ class TestInventory:
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
         #возвращаемся в каталог
-        go_back_to_catalog = page.locator('.back-to-products')
+        go_back_to_catalog = page.locator('#back-to-products')
         go_back_to_catalog.click()
         #проверяем, что успешно вернулись назад
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
+
+
+
+    def test_sorting(self, page: Page):
+
+        #переход на страницу
+        page.goto(BASE_URL)
+
+        #ввод логина
+        input_username = page.locator('#user-name')
+        input_username.fill(STANDARD_USER)
+
+        #ввод пароля
+        input_password = page.locator('#password')
+        input_password.fill(PASSWORD)
+
+        #отправка формы/авторизация
+        button_login = page.locator('#login-button')
+        button_login.click()
+
+
+
+
 
 
 
