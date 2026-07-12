@@ -1,0 +1,34 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Python кэш
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# pytest
+.pytest_cache/
+.coverage
+
+# Секреты
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Allure
+allure-results/
+
+# OS
+Thumbs.db
+
+# Специфично для UI-проекта:
+browser-state.json      # сохранённая сессия — содержит чувствительные данные (email, пароль)
+screenshots/            # скриншоты падений тестов, если сохраняешь локально
+videos/                 # видео прогонов, если включена запись
+test-results/           # папка по умолчанию куда pytest-playwright складывает трейсы/скриншоты
+playwright-report/      # HTML-отчёт от встроенного Playwright test runner
