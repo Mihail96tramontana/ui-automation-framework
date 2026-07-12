@@ -89,7 +89,7 @@ class TestInventory:
         item_first_in_cart = page.locator('.shopping_cart_link')
         item_first_in_cart.click()
         #проверяем, что товар добавлен
-        expect(page.locator('.inventory_item_name')).to_have_text('Sauce Labs Backpack')
+        expect(page.locator('#item_4_title_link .inventory_item_name')).to_have_text('Sauce Labs Backpack')
         #возвращаемся на страницу списка товаров
         page.go_back()
 
@@ -98,12 +98,12 @@ class TestInventory:
         #проверяем, что каунтер корзины - 2
         expect(page.locator('.shopping_cart_badge')).to_have_text('2')
         #проверяем, что кнопка изменилась с Add to cart на Remove
-        expect(page.locator('#add-to-cart-sauce-labs-fleece-jacket')).to_have_text('Remove')
+        expect(page.locator('#remove-sauce-labs-fleece-jacket')).to_have_text('Remove')
         #переходим в корзину
         item_first_in_cart = page.locator('.shopping_cart_link')
         item_first_in_cart.click()
         #проверяем, что товар добавлен
-        expect(page.locator('.inventory_item_name')).to_have_text('')
+        expect(page.locator('#item_5_title_link .inventory_item_name')).to_have_text('Sauce Labs Fleece Jacket')
         #возвращаемся на страницу списка товаров
         page.go_back()
 
@@ -112,15 +112,43 @@ class TestInventory:
         #проверяем, что каунтер корзины - 3
         expect(page.locator('.shopping_cart_badge')).to_have_text('3')
         #проверяем, что кнопка изменилась с Add to cart на Remove
-        expect(page.locator('#add-to-cart-sauce-labs-onesie')).to_have_text('Remove')
+        expect(page.locator('#remove-sauce-labs-onesie')).to_have_text('Remove')
         #переходим в корзину
         item_first_in_cart = page.locator('.shopping_cart_link')
         item_first_in_cart.click()
         #проверяем, что товар добавлен
-        expect(page.locator('.inventory_item_name')).to_have_text('')
+        expect(page.locator('#item_2_title_link .inventory_item_name')).to_have_text('Sauce Labs Onesie')
+
 
         #итоговые проверки добавленных товаров в корзину
-        
+
+        #проверяем, что всего 3 карточки товаров
+        expect(page.locator('.cart_item')).to_have_count(3)
+
+        #проверяем, что цены соответствуют добавленным товарам
+        index_price_one = page.locator('.inventory_item_price').nth(0)
+        expect(index_price_one).to_have_text('$29.99')
+
+        index_price_two = page.locator('.inventory_item_price').nth(1)
+        expect(index_price_two).to_have_text('$49.99')
+
+        index_price_three = page.locator('.inventory_item_price').nth(2)
+        expect(index_price_three).to_have_text('$7.99')
+
+        #проверяем, что у всех товаров есть кнопки удаления из корзины - Remove
+        expect(page.locator('#remove-sauce-labs-backpack')).to_have_text('Remove')
+        expect(page.locator('#remove-sauce-labs-fleece-jacket')).to_have_text('Remove')
+        expect(page.locator('#remove-sauce-labs-onesie')).to_have_text('Remove')
+
+        #проверяем, что добавлены нужные товары
+        index_name_item_one = page.locator('.inventory_item_name').nth(0)
+        expect(index_name_item_one).to_have_text('Sauce Labs Backpack')
+
+        index_name_item_two = page.locator('.inventory_item_name').nth(1)
+        expect(index_name_item_two).to_have_text('Sauce Labs Fleece Jacket')
+
+        index_name_item_three = page.locator('.inventory_item_name').nth(2)
+        expect(index_name_item_three).to_have_text('Sauce Labs Onesie')
 
 
 
