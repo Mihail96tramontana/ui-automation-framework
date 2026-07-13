@@ -1,25 +1,15 @@
 import pytest
 from playwright.sync_api import expect, Page
 from config import BASE_URL, PASSWORD, STANDARD_USER, LOCKED_USER
+from pages.login_page import LoginPage
 
 
 class TestLogin:
     def test_successful_login(self, page: Page):
 
-            #переход на страницу
-            page.goto(BASE_URL)
-
-            #ввод логина
-            input_username = page.locator('#user-name')
-            input_username.fill(STANDARD_USER)
-
-            #ввод пароля
-            input_password = page.locator('#password')
-            input_password.fill(PASSWORD)
-
-            #отправка формы
-            button_login = page.locator('#login-button')
-            button_login.click()
+            login_page = LoginPage(page)
+            login_page.open() #переходим на сайт
+            login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
 
             #проверки после авторизации
             expect(page).to_have_url(f'{BASE_URL}inventory.html') #проверка URL
@@ -30,20 +20,9 @@ class TestLogin:
 
     def test_locked_out_user_login(self, page: Page):
 
-            # переход на страницу
-            page.goto(BASE_URL)
-
-            # ввод логина
-            input_username = page.locator('#user-name')
-            input_username.fill(LOCKED_USER)
-
-            # ввод пароля
-            input_password = page.locator('#password')
-            input_password.fill(PASSWORD)
-
-            # отправка формы
-            button_login = page.locator('#login-button')
-            button_login.click()
+            login_page = LoginPage(page)
+            login_page.open()
+            login_page.login(LOCKED_USER, PASSWORD)
 
             expect(page).to_have_url(BASE_URL)
             expect(page.locator('h3[data-test="error"]')).to_have_text('Epic sadface: Sorry, this user has been locked out.')
@@ -65,20 +44,9 @@ class TestLogin:
     ])
     def test_invalid_login(self, page: Page, username, password, error_text):
 
-            # переход на страницу
-            page.goto(BASE_URL)
-
-            # ввод логина
-            input_username = page.locator('#user-name')
-            input_username.fill(username)
-
-            # ввод пароля
-            input_password = page.locator('#password')
-            input_password.fill(password)
-
-            # отправка формы
-            button_login = page.locator('#login-button')
-            button_login.click()
+            login_page = LoginPage(page)
+            login_page.open()
+            login_page.login(username, password)
 
             expect(page).to_have_url(BASE_URL)
             expect(page.locator('h3[data-test="error"]')).to_have_text(error_text)
