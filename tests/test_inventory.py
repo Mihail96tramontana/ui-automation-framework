@@ -1,6 +1,6 @@
 from playwright.sync_api import expect, Page
 from pages.login_page import LoginPage
-
+from pages.cart_page import CartPage
 from config import BASE_URL, PASSWORD, STANDARD_USER
 
 class TestInventory:
@@ -15,62 +15,53 @@ class TestInventory:
         expect(page.locator('.inventory_item')).to_have_count(6)
 
 
-
     def test_adding_to_cart_single_item(self, page: Page):
 
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+
         login_page.open()  # переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
 
-        #добавляем товар в корзину
-        add_to_cart_one = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_to_cart_one.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
         #проверки
         expect(page).to_have_url(f'{BASE_URL}inventory.html') #проверка URL
         expect(page.locator('#remove-sauce-labs-backpack')).to_have_text('Remove') #проверка, что кнопка Add to cart поменялась на Remove
         expect(page.locator('.shopping_cart_badge')).to_have_text('1') #проверка, что каунтер товаров в корзине равен 1
 
-        #добавляем второй товар в корзину
-        add_to_cart_two = page.locator('#add-to-cart-sauce-labs-fleece-jacket')
-        add_to_cart_two.click()
+        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
 
         #проверяем, что каунтер увеличился до 2
         expect(page.locator('.shopping_cart_badge')).to_have_text('2')
 
 
-
     def test_removing_item_from_cart(self, page: Page):
 
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+
         login_page.open()  # переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
 
-        #добавляем товар в корзину
-        add_to_cart_one = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_to_cart_one.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        #добавляем второй товар в корзину
-        add_to_cart_two = page.locator('#add-to-cart-sauce-labs-fleece-jacket')
-        add_to_cart_two.click()
+        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
 
-        #удаляем первый товар из корзины
-        delete_item_one_from_cart = page.locator('#remove-sauce-labs-backpack')
-        delete_item_one_from_cart.click()
+        cart_page.remove_sauce_labs_backpack() #удаляем первый товар из корзины
         #проверяем, что каунтер уменьшился на 1
         expect(page.locator('.shopping_cart_badge')).to_have_text('1')
 
-        #удаляем второй товар из корзины
-        delete_item_two_from_cart = page.locator('#remove-sauce-labs-fleece-jacket')
-        delete_item_two_from_cart.click()
+        cart_page.remove_sauce_labs_bike_light() #удаляем второй товар из корзины
         #проверяем, что каунтер исчез
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
-
 
 
     def test_item_page(self, page: Page):
 
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+
         login_page.open()  # переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
 
@@ -85,15 +76,11 @@ class TestInventory:
         expect(page.locator('.inventory_details_desc.large_size')).to_have_text('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')
         expect(page.locator('.btn.btn_primary.btn_small.btn_inventory')).to_be_visible()
 
-        #добавляем товар в корзину
-        add_to_cart = page.locator('#add-to-cart')
-        add_to_cart.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
         #проверяем, что каунтер стал 1
         expect(page.locator('.shopping_cart_badge')).to_have_text('1')
 
-        #удаляем товар из корзины
-        remove_item_from_cart = page.locator('#remove')
-        remove_item_from_cart.click()
+        cart_page.add_sauce_labs_backpack()
         #проверяем отсутствие каунтера у корзины
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
@@ -102,7 +89,6 @@ class TestInventory:
         go_back_to_catalog.click()
         #проверяем, что успешно вернулись назад
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
-
 
 
     def test_sorting_low_to_high(self, page: Page):
