@@ -1,21 +1,23 @@
 from playwright.sync_api import expect, Page
-from pytest_playwright.pytest_playwright import page
-
 from config import BASE_URL, PASSWORD, STANDARD_USER
 from pages.login_page import LoginPage
+from pages.cart_page import CartPage
+from pages.inventory_page import InventoryPage
 
 class TestCart:
     def test_add_item_in_cart(self, page: Page):
 
+        #создаём объекты Page Object
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+        inventory_page = InventoryPage(page)
+
         login_page.open() #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
 
-        add_item = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_item.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        open_cart = page.locator('.shopping_cart_link')
-        open_cart.click()
+        inventory_page.catalog_to_cart() #переходим в корзину
 
         expect(page).to_have_url(f'{BASE_URL}cart.html')
         expect(page.locator('.shopping_cart_badge')).to_have_text('1')
@@ -27,55 +29,50 @@ class TestCart:
         expect(price_text).to_have_text('$29.99')
         expect(page.locator('.cart_quantity')).to_have_count(1)
 
-        button_catalog = page.locator('#continue-shopping')
-        button_catalog.click()
+        cart_page.cart_to_catalog() #переходим обратно в каталог
+
+        expect(page).to_have_url(f'{BASE_URL}inventory.html') #проверяем, что при переходе в каталог попадаем именно в каталог
 
     def test_remove_item_from_cart(self, page: Page):
 
+        #создаём объекты Page Object
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+        inventory_page = InventoryPage(page)
+
         login_page.open()  #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  #авторизуемся
 
-        add_item = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_item.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        open_cart = page.locator('.shopping_cart_link')
-        open_cart.click()
+        inventory_page.catalog_to_cart() #переходим в корзину
 
-        #удаление товара из корзины
-        button_remove = page.locator('#remove-sauce-labs-backpack')
-        button_remove.click()
+        cart_page.remove_sauce_labs_backpack() #удаляем первый товар из корзины
 
         expect(page.locator('.cart_item')).to_be_hidden()
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
     def test_add_remove_add_item_to_cart(self, page: Page):
 
+        #создаём объекты Page Object
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+        inventory_page = InventoryPage(page)
+
         login_page.open()  #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  #авторизуемся
 
-        add_item = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_item.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        open_cart = page.locator('.shopping_cart_link')
-        open_cart.click()
+        inventory_page.catalog_to_cart() #переходим в корзину
 
-        #удаление товара из корзины
-        button_remove = page.locator('#remove-sauce-labs-backpack')
-        button_remove.click()
+        cart_page.remove_sauce_labs_backpack() #удаляем первый товар из корзины
 
-        #возвращаемся в каталог
-        button_catalog = page.locator('#continue-shopping')
-        button_catalog.click()
+        cart_page.cart_to_catalog() #переходим обратно в каталог
 
-        #добавление товара в корзину
-        add_item = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_item.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        #переход в корзину
-        open_cart = page.locator('.shopping_cart_link')
-        open_cart.click()
+        inventory_page.catalog_to_cart() #переходим в корзину
 
         expect(page.locator('.shopping_cart_badge')).to_have_text('1')
         expect(page.locator('#item_4_title_link')).to_have_text('Sauce Labs Backpack')
@@ -88,24 +85,21 @@ class TestCart:
 
     def test_add_multiple_to_cart(self, page: Page):
 
+        #создаём объекты Page Object
         login_page = LoginPage(page)
+        cart_page = CartPage(page)
+        inventory_page = InventoryPage(page)
+
         login_page.open()  #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  #авторизуемся
 
-        #добавляем первый товар в корзину
-        add_item_one = page.locator('#add-to-cart-sauce-labs-backpack')
-        add_item_one.click()
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
 
-        #добавляем второй товар в корзину
-        add_item_two = page.locator('#add-to-cart-sauce-labs-bike-light')
-        add_item_two.click()
+        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
 
-        #добавляем третий товар в корзину
-        add_item_three = page.locator('#add-to-cart-sauce-labs-bolt-t-shirt')
-        add_item_three.click()
+        cart_page.add_sauce_labs_bolt_t_shirt() #добавляем в корзину третий объект
 
-        open_cart = page.locator('.shopping_cart_link')
-        open_cart.click()
+        inventory_page.catalog_to_cart() #переходим в корзину
 
         expect(page.locator('.shopping_cart_badge')).to_have_text('3')
         expect(page.locator('.cart_item')).to_have_count(3)
