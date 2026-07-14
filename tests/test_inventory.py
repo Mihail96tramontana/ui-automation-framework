@@ -66,21 +66,27 @@ class TestInventory:
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
 
         #проваливаемся в карточку товара
-        open_item = page.locator('img[data-test="inventory-item-sauce-labs-backpack-img"]')
+        open_item = page.locator('#item_3_title_link')
         open_item.click()
 
         #общие проверки страницы товара
-        expect(page).to_have_url(f'{BASE_URL}inventory-item.html?id=4')
-        expect(page.locator('.inventory_details_name.large_size')).to_have_text('Sauce Labs Backpack')
-        expect(page.locator('.inventory_details_price')).to_have_text('$29.99')
-        expect(page.locator('.inventory_details_desc.large_size')).to_have_text('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.')
+        expect(page).to_have_url(f'{BASE_URL}inventory-item.html?id=3')
+        expect(page.locator('.inventory_details_name.large_size')).to_have_text('Test.allTheThings() T-Shirt (Red)')
+        expect(page.locator('.inventory_details_price')).to_have_text('$15.99')
+        expect(page.locator('.inventory_details_desc.large_size')).to_have_text('This classic Sauce Labs t-shirt is perfect to wear when cozying up to your keyboard to automate a few tests. Super-soft and comfy ringspun combed cotton.')
         expect(page.locator('.btn.btn_primary.btn_small.btn_inventory')).to_be_visible()
 
-        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
+        #добавляем в корзину объект
+        add_to_cart = page.locator('#add-to-cart')
+        add_to_cart.click()
+
         #проверяем, что каунтер стал 1
         expect(page.locator('.shopping_cart_badge')).to_have_text('1')
 
-        cart_page.add_sauce_labs_backpack()
+        #удаляем объект из корзины
+        remove_from_cart = page.locator('#remove')
+        remove_from_cart.click()
+
         #проверяем отсутствие каунтера у корзины
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
