@@ -1,8 +1,5 @@
 from playwright.sync_api import expect, Page
-from config import BASE_URL, PASSWORD, STANDARD_USER, NAME, LAST_NAME, POSTAL_CODE
-from pages.login_page import LoginPage
-from pages.cart_page import CartPage
-from pages.inventory_page import InventoryPage
+from config import BASE_URL, NAME, LAST_NAME, POSTAL_CODE
 from pages.checkout_page import CheckoutPage
 import pytest
 
@@ -37,7 +34,7 @@ class TestCheckout:
     ])
     def test_empty_fields(self, page: Page, first_name, last_name, postal_code, expected_text_error, fixture_login_add_item_checkout):
 
-        #создаём объекты Page Object
+        #создаём объект Page Object
         checkout_page = CheckoutPage(page)
 
         #фикстура с авторизацией/добавлением 1 товара в корзину/переходом к заполнению формы при покупке
@@ -49,10 +46,10 @@ class TestCheckout:
         #переход с формы к итоговой сумме оплаты
         checkout_page.your_information_form_to_total_price()
 
+        #проверки
         #проверяем, что ошибка отображается корректно
         expect(page.locator('h3[data-test="error"]')).to_be_visible()
         expect(page.locator('h3[data-test="error"]')).to_have_text(expected_text_error)
-
         #проверяем, что кнопка возвращения в корзину отображается
         expect(page.locator('#cancel')).to_be_visible()
 
@@ -107,20 +104,27 @@ class TestCheckout:
         expect(page.locator('#cancel')).to_be_visible()
         expect(page.locator('#finish')).to_be_visible()
 
+
+
         #проверка, что суммы считаются корректно
         #достаём сумму всех товаров
         item_total = 0
         for i in all_price_item_correct:
             float_price = float(i.replace('$',''))
             item_total += float_price
+
         #достаём сумму таксы
         tax = page.locator('.summary_tax_label').inner_text()
         new_tax = float(tax.replace('Tax: $',''))
+
         #достаём общую сумму
         total_price = page.locator('.summary_total_label').inner_text()
         total_price_new = float(total_price.replace('Total: $', ''))
+
         #сравниваем, что итоговая сумма равна таксе и сумме товаров
         assert total_price_new == new_tax + item_total
+
+
 
         #клик по кнопке возвращения к каталогу
         button_overview_to_catalog = page.locator('#cancel')
