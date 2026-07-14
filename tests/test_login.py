@@ -8,6 +8,7 @@ class TestLogin:
     def test_successful_login(self, page: Page):
 
             login_page = LoginPage(page)
+
             login_page.open() #переходим на сайт
             login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
 
@@ -21,6 +22,7 @@ class TestLogin:
     def test_locked_out_user_login(self, page: Page):
 
             login_page = LoginPage(page)
+
             login_page.open()
             login_page.login(LOCKED_USER, PASSWORD)
 
@@ -45,6 +47,7 @@ class TestLogin:
     def test_invalid_login(self, page: Page, username, password, error_text):
 
             login_page = LoginPage(page)
+            
             login_page.open()
             login_page.login(username, password)
 

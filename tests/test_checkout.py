@@ -1,8 +1,9 @@
 from playwright.sync_api import expect, Page
-from config import BASE_URL, PASSWORD, STANDARD_USER
+from config import BASE_URL, PASSWORD, STANDARD_USER, NAME, LAST_NAME, POSTAL_CODE
 from pages.login_page import LoginPage
 from pages.cart_page import CartPage
 from pages.inventory_page import InventoryPage
+from pages.checkout_page import CheckoutPage
 import pytest
 
 
@@ -47,12 +48,13 @@ class TestCheckout:
         ('test','','test','Error: Last Name is required'),
         ('test','test','','Error: Postal Code is required')
     ])
-    def test_empty_mandatory_fields(self, page: Page, first_name, last_name, postal_code, expected_text_error):
+    def test_empty_fields(self, page: Page, first_name, last_name, postal_code, expected_text_error):
 
         #создаём объекты Page Object
         login_page = LoginPage(page)
         cart_page = CartPage(page)
         inventory_page = InventoryPage(page)
+        checkout_page = CheckoutPage(page)
 
         login_page.open() #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
@@ -66,18 +68,7 @@ class TestCheckout:
         button_checkout.click()
 
         #заполнение формы
-        #ввод в поле First Name
-        input_first_name = page.locator('#first-name')
-        input_first_name.fill(first_name)
-        #ввод в поле Last Name
-        input_last_name = page.locator('#last-name')
-        input_last_name.fill(last_name)
-        #ввод в поле Zip/Postal Code
-        input_postal_code = page.locator('#postal-code')
-        input_postal_code.fill(postal_code)
-        #клик по кнопке continue
-        button_continue = page.locator('#continue')
-        button_continue.click()
+        checkout_page.your_information_form(first_name, last_name, postal_code)
 
         #проверяем, что ошибка отображается корректно
         expect(page.locator('h3[data-test="error"]')).to_be_visible()
@@ -101,6 +92,7 @@ class TestCheckout:
         login_page = LoginPage(page)
         cart_page = CartPage(page)
         inventory_page = InventoryPage(page)
+        checkout_page = CheckoutPage(page)
 
         login_page.open() #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
@@ -117,18 +109,7 @@ class TestCheckout:
         button_checkout.click()
 
         #заполнение формы
-        #ввод в поле First Name
-        input_first_name = page.locator('#first-name')
-        input_first_name.fill('test_name')
-        #ввод в поле Last Name
-        input_last_name = page.locator('#last-name')
-        input_last_name.fill('test_name')
-        #ввод в поле Zip/Postal Code
-        input_postal_code = page.locator('#postal-code')
-        input_postal_code.fill('test_postal_code')
-        #клик по кнопке continue
-        button_continue = page.locator('#continue')
-        button_continue.click()
+        checkout_page.your_information_form(NAME, LAST_NAME, POSTAL_CODE)
 
         #проверки
         expect(page).to_have_url(f'{BASE_URL}checkout-step-two.html')
@@ -181,13 +162,14 @@ class TestCheckout:
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
 
 
-    #переходим на финальную со стр итоговой суммы после прожатия на кнопку finish
+    #переходим на финальную со стр итоговой суммы после прожатия на кнопку finish и возвращаемся в каталог обратно (перехода на стр с итоговой суммой нет)
     def test_checkout_overview_to_finish(self, page: Page):
 
         #создаём объекты Page Object
         login_page = LoginPage(page)
         cart_page = CartPage(page)
         inventory_page = InventoryPage(page)
+        checkout_page = CheckoutPage(page)
 
         login_page.open() #переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
@@ -204,18 +186,7 @@ class TestCheckout:
         button_checkout.click()
 
         #заполнение формы
-        #ввод в поле First Name
-        input_first_name = page.locator('#first-name')
-        input_first_name.fill('test_name')
-        #ввод в поле Last Name
-        input_last_name = page.locator('#last-name')
-        input_last_name.fill('test_name')
-        #ввод в поле Zip/Postal Code
-        input_postal_code = page.locator('#postal-code')
-        input_postal_code.fill('test_postal_code')
-        #клик по кнопке continue
-        button_continue = page.locator('#continue')
-        button_continue.click()
+        checkout_page.your_information_form(NAME, LAST_NAME, POSTAL_CODE)
         #клик по кнопке finish
         button_finish = page.locator('#finish')
         button_finish.click()
