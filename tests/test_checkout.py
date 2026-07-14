@@ -10,23 +10,10 @@ import pytest
 class TestCheckout:
 
     #переходим на страницу заполнения формы
-    def test_proceed_to_checkout(self, page: Page):
+    def test_proceed_to_checkout(self, page: Page, fixture_login_add_item_checkout):
 
-        #создаём объекты Page Object
-        login_page = LoginPage(page)
-        cart_page = CartPage(page)
-        inventory_page = InventoryPage(page)
-
-        login_page.open()  #переходим на сайт
-        login_page.login(STANDARD_USER, PASSWORD)  #авторизуемся
-
-        cart_page.add_sauce_labs_backpack()  #добавляем в корзину первый объект
-
-        inventory_page.catalog_to_cart()  #переходим в корзину
-
-        #инициируем процесс оформления товара
-        button_checkout = page.locator('#checkout')
-        button_checkout.click()
+        #фикстура с авторизацией/добавлением 1 товара в корзину/переходом к заполнению формы при покупке
+        page=fixture_login_add_item_checkout
 
         expect(page).to_have_url(f'{BASE_URL}checkout-step-one.html')
         expect(page.locator('#first-name')).to_be_visible()
@@ -48,27 +35,19 @@ class TestCheckout:
         ('test','','test','Error: Last Name is required'),
         ('test','test','','Error: Postal Code is required')
     ])
-    def test_empty_fields(self, page: Page, first_name, last_name, postal_code, expected_text_error):
+    def test_empty_fields(self, page: Page, first_name, last_name, postal_code, expected_text_error, fixture_login_add_item_checkout):
 
         #создаём объекты Page Object
-        login_page = LoginPage(page)
-        cart_page = CartPage(page)
-        inventory_page = InventoryPage(page)
         checkout_page = CheckoutPage(page)
 
-        login_page.open() #переходим на сайт
-        login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
-
-        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
-
-        inventory_page.catalog_to_cart() #переходим в корзину
-
-        #инициируем процесс оформления товара
-        button_checkout = page.locator('#checkout')
-        button_checkout.click()
+        #фикстура с авторизацией/добавлением 1 товара в корзину/переходом к заполнению формы при покупке
+        page = fixture_login_add_item_checkout
 
         #заполнение формы
         checkout_page.your_information_form(first_name, last_name, postal_code)
+
+        #переход с формы к итоговой сумме оплаты
+        checkout_page.your_information_form_to_total_price()
 
         #проверяем, что ошибка отображается корректно
         expect(page.locator('h3[data-test="error"]')).to_be_visible()
@@ -86,30 +65,18 @@ class TestCheckout:
 
 
     #переходим со страницы заполнения формы на стр с итоговой суммой покупки и проверяем её, после чего возвращаемся в каталог (перехода в корзину нет)
-    def test_checkout_your_information_to_overview(self, page: Page):
+    def test_checkout_your_information_to_overview(self, page: Page, fixture_login_add_three_item_checkout):
 
-        #создаём объекты Page Object
-        login_page = LoginPage(page)
-        cart_page = CartPage(page)
-        inventory_page = InventoryPage(page)
         checkout_page = CheckoutPage(page)
 
-        login_page.open() #переходим на сайт
-        login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
-
-        #добавляем товары в корзину
-        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
-        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
-        cart_page.add_sauce_labs_bolt_t_shirt() #добавляем в корзину третий объект
-
-        inventory_page.catalog_to_cart() #переходим в корзину
-
-        #инициируем процесс оформления товара
-        button_checkout = page.locator('#checkout')
-        button_checkout.click()
+        #фикстура с авторизацией/добавлением 3 товаров в корзину/переходом к заполнению формы при покупке
+        page = fixture_login_add_three_item_checkout
 
         #заполнение формы
         checkout_page.your_information_form(NAME, LAST_NAME, POSTAL_CODE)
+
+        #переход с формы к итоговой сумме оплаты
+        checkout_page.your_information_form_to_total_price()
 
         #проверки
         expect(page).to_have_url(f'{BASE_URL}checkout-step-two.html')
@@ -163,30 +130,19 @@ class TestCheckout:
 
 
     #переходим на финальную со стр итоговой суммы после прожатия на кнопку finish и возвращаемся в каталог обратно (перехода на стр с итоговой суммой нет)
-    def test_checkout_overview_to_finish(self, page: Page):
+    def test_checkout_overview_to_finish(self, page: Page, fixture_login_add_three_item_checkout):
 
-        #создаём объекты Page Object
-        login_page = LoginPage(page)
-        cart_page = CartPage(page)
-        inventory_page = InventoryPage(page)
         checkout_page = CheckoutPage(page)
 
-        login_page.open() #переходим на сайт
-        login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
-
-        #добавляем товары в корзину
-        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
-        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
-        cart_page.add_sauce_labs_bolt_t_shirt() #добавляем в корзину третий объект
-
-        inventory_page.catalog_to_cart() #переходим в корзину
-
-        #инициируем процесс оформления товара
-        button_checkout = page.locator('#checkout')
-        button_checkout.click()
+        #фикстура с авторизацией/добавлением 3 товаров в корзину/переходом к заполнению формы при покупке
+        page = fixture_login_add_three_item_checkout
 
         #заполнение формы
         checkout_page.your_information_form(NAME, LAST_NAME, POSTAL_CODE)
+
+        #переход с формы к итоговой сумме оплаты
+        checkout_page.your_information_form_to_total_price()
+
         #клик по кнопке finish
         button_finish = page.locator('#finish')
         button_finish.click()

@@ -10,6 +10,7 @@ class CheckoutPage:
         self.input_first_name = page.locator('#first-name')
         self.input_last_name = page.locator('#last-name')
         self.input_postal_code = page.locator('#postal-code')
+        #локатор для перехода на стр с итоговой оплатой после заполнения формы
         self.button_continue = page.locator('#continue')
 
 
@@ -18,4 +19,6 @@ class CheckoutPage:
         self.input_first_name.fill(first_name)
         self.input_last_name.fill(last_name)
         self.input_postal_code.fill(postal_code)
+
+    def your_information_form_to_total_price(self,):
         self.button_continue.click()
