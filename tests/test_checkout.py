@@ -165,6 +165,33 @@ class TestCheckout:
 
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
 
+    def test_download_pdf(self, page: Page, fixture_login_add_three_item_checkout):
+
+        checkout_page = CheckoutPage(page)
+
+        #фикстура с авторизацией/добавлением 3 товаров в корзину/переходом к заполнению формы при покупке
+        page = fixture_login_add_three_item_checkout
+
+        #заполнение формы
+        checkout_page.your_information_form(NAME, LAST_NAME, POSTAL_CODE)
+
+        #переход с формы к итоговой сумме оплаты
+        checkout_page.your_information_form_to_total_price()
+
+        #клик по кнопке finish
+        button_finish = page.locator('#finish')
+        button_finish.click()
+
+        #скачивание пдф-файла
+        with page.expect_download() as download_info:
+            button_pdf = page.locator('#generate-pdf-order') #локатор оборачиваем в контекстный менеджер
+            button_pdf.click()
+
+        download = download_info.value
+        assert '.pdf' in download.suggested_filename #проверяем через имя файла его формат
+
+
+
 
 
 
