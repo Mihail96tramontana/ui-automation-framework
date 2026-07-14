@@ -8,6 +8,7 @@ import pytest
 
 class TestCheckout:
 
+    #переходим на страницу заполнения формы
     def test_proceed_to_checkout(self, page: Page):
 
         #создаём объекты Page Object
@@ -39,6 +40,7 @@ class TestCheckout:
         expect(page.locator('.title')).to_have_text('Checkout: Your Information')
 
 
+    #заполняем форму на странице Checkout: Your Information и пробуем вернуться в корзину обратно
     @pytest.mark.parametrize('first_name, last_name, postal_code, expected_text_error', [
         ('','','','Error: First Name is required'),
         ('','test','test','Error: First Name is required'),
@@ -81,35 +83,19 @@ class TestCheckout:
         expect(page.locator('h3[data-test="error"]')).to_be_visible()
         expect(page.locator('h3[data-test="error"]')).to_have_text(expected_text_error)
 
-    def test_checkout_to_catalog(self, page: Page):
+        #проверяем, что кнопка возвращения в корзину отображается
+        expect(page.locator('#cancel')).to_be_visible()
 
-        #создаём объекты Page Object
-        login_page = LoginPage(page)
-        cart_page = CartPage(page)
-        inventory_page = InventoryPage(page)
+        #возвращение назад в корзину из процесса оформления товара
+        button_checkout_to_cart = page.locator('#cancel')
+        button_checkout_to_cart.click()
 
-        login_page.open() #переходим на сайт
-        login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
+        #проверяем, что вернулись именно в корзину
+        expect(page).to_have_url(f'{BASE_URL}cart.html')
 
-        #добавляем товары в корзину
-        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
-        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
-        cart_page.add_sauce_labs_bolt_t_shirt() #добавляем в корзину третий объект
 
-        inventory_page.catalog_to_cart() #переходим в корзину
-
-        #инициируем процесс оформления товара
-        button_checkout = page.locator('#checkout')
-        button_checkout.click()
-
-        #возвращение назад в каталог из процесса оформления товара
-        checkout_to_catalog = page.locator('.continue-shopping')
-        checkout_to_catalog.click()
-
-        #проверяем, что вернулись именно в каталог
-        expect(page).to_have_url(f'{BASE_URL}inventory.html')
-
-    def test_fill_checkout_form(self, page: Page):
+    #переходим со страницы заполнения формы на стр с итоговой суммой покупки и проверяем её, после чего возвращаемся в каталог (перехода в корзину нет)
+    def test_checkout_your_information_to_overview(self, page: Page):
 
         #создаём объекты Page Object
         login_page = LoginPage(page)
@@ -170,6 +156,8 @@ class TestCheckout:
 
         #проверка наличия элементов на странице
         expect(page.locator('.cart_item')).to_have_count(3)
+        expect(page.locator('#cancel')).to_be_visible()
+        expect(page.locator('#finish')).to_be_visible()
 
         #проверка, что суммы считаются корректно
         #достаём сумму всех товаров
@@ -185,6 +173,73 @@ class TestCheckout:
         total_price_new = float(total_price.replace('Total: $', ''))
         #сравниваем, что итоговая сумма равна таксе и сумме товаров
         assert total_price_new == new_tax + item_total
+
+        #клик по кнопке возвращения к каталогу
+        button_overview_to_catalog = page.locator('#cancel')
+        button_overview_to_catalog.click()
+
+        expect(page).to_have_url(f'{BASE_URL}inventory.html')
+
+
+    #переходим на финальную со стр итоговой суммы после прожатия на кнопку finish
+    def test_checkout_overview_to_finish(self, page: Page):
+
+        #создаём объекты Page Object
+        login_page = LoginPage(page)
+        cart_page = CartPage(page)
+        inventory_page = InventoryPage(page)
+
+        login_page.open() #переходим на сайт
+        login_page.login(STANDARD_USER, PASSWORD) #авторизуемся
+
+        #добавляем товары в корзину
+        cart_page.add_sauce_labs_backpack() #добавляем в корзину первый объект
+        cart_page.add_sauce_labs_bike_light() #добавляем в корзину второй объект
+        cart_page.add_sauce_labs_bolt_t_shirt() #добавляем в корзину третий объект
+
+        inventory_page.catalog_to_cart() #переходим в корзину
+
+        #инициируем процесс оформления товара
+        button_checkout = page.locator('#checkout')
+        button_checkout.click()
+
+        #заполнение формы
+        #ввод в поле First Name
+        input_first_name = page.locator('#first-name')
+        input_first_name.fill('test_name')
+        #ввод в поле Last Name
+        input_last_name = page.locator('#last-name')
+        input_last_name.fill('test_name')
+        #ввод в поле Zip/Postal Code
+        input_postal_code = page.locator('#postal-code')
+        input_postal_code.fill('test_postal_code')
+        #клик по кнопке continue
+        button_continue = page.locator('#continue')
+        button_continue.click()
+        #клик по кнопке finish
+        button_finish = page.locator('#finish')
+        button_finish.click()
+
+        expect(page).to_have_url(f'{BASE_URL}checkout-complete.html')
+        expect(page.locator('.complete-header')).to_be_visible()
+        expect(page.locator('.complete-header')).to_have_text('Thank you for your order!')
+        expect(page.locator('.complete-text')).to_be_visible()
+        expect(page.locator('.complete-text')).to_have_text('Your order has been dispatched, and will arrive just as fast as the pony can get there!')
+        expect(page.locator('#back-to-products')).to_be_visible()
+        expect(page.locator('#generate-pdf-order')).to_be_visible()
+
+        #возвращаемся в каталог обратно
+        go_back_catalog = page.locator('#back-to-products')
+        go_back_catalog.click()
+
+        expect(page).to_have_url(f'{BASE_URL}inventory.html')
+
+
+
+
+
+
+
 
 
 
