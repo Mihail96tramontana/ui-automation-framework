@@ -31,9 +31,9 @@ jobs:
           STANDARD_USER: standard_user
           LOCKED_USER: locked_out_user
           PASSWORD: secret_sauce
-          NAME: test_first_name
-          LAST_NAME: test_last_name
-          POSTAL_CODE: test_postal_code
+          FIRST_NAME: ${{ secrets.FIRST_NAME }}
+          LAST_NAME: ${{ secrets.LAST_NAME }}
+          POSTAL_CODE: ${{ secrets.POSTAL_CODE }}
         run: pytest --alluredir=allure-results
 
       - name: Upload Allure results
