@@ -60,7 +60,6 @@ class TestInventory:
     def test_item_page(self, page: Page):
 
         login_page = LoginPage(page)
-        cart_page = CartPage(page)
 
         login_page.open()  # переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
