@@ -53,9 +53,8 @@ class TestCheckout:
         #проверяем, что кнопка возвращения в корзину отображается
         expect(page.locator('#cancel')).to_be_visible()
 
-        #возвращение назад в корзину из процесса оформления товара
-        button_checkout_to_cart = page.locator('#cancel')
-        button_checkout_to_cart.click()
+        #возвращение назад в корзину из процесса заполнения формы
+        checkout_page.button_cancel_your_information()
 
         #проверяем, что вернулись именно в корзину
         expect(page).to_have_url(f'{BASE_URL}cart.html')
@@ -148,8 +147,7 @@ class TestCheckout:
         checkout_page.your_information_form_to_total_price()
 
         #клик по кнопке finish
-        button_finish = page.locator('#finish')
-        button_finish.click()
+        checkout_page.button_finish_click()
 
         expect(page).to_have_url(f'{BASE_URL}checkout-complete.html')
         expect(page.locator('.complete-header')).to_be_visible()
@@ -179,10 +177,9 @@ class TestCheckout:
         checkout_page.your_information_form_to_total_price()
 
         #клик по кнопке finish
-        button_finish = page.locator('#finish')
-        button_finish.click()
+        checkout_page.button_finish_click()
 
-        #скачивание пдф-файла
+        #скачивание пдф-файла и проверка, что он имеет формат pdf
         with page.expect_download() as download_info:
             button_pdf = page.locator('#generate-pdf-order') #локатор оборачиваем в контекстный менеджер
             button_pdf.click()

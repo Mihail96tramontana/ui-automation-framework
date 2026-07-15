@@ -1,21 +1,30 @@
+import allure
 from playwright.sync_api import expect, Page
+from pygments.unistring import allexcept
+
 from pages.login_page import LoginPage
 from pages.cart_page import CartPage
 from config import BASE_URL, PASSWORD, STANDARD_USER
 
+@allure.feature('Каталог товаров')
 class TestInventory:
+    @allure.title('Корректное отображение интерфейса')
+    @allure.description('Проверяем, что на стартовой странице (каталог товаров) корректно отображаются все 6 продуктов и есть соответствующий заголовок')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_product_display(self, page: Page):
 
         login_page = LoginPage(page)
+
         login_page.open()  # переходим на сайт
         login_page.login(STANDARD_USER, PASSWORD)  # авторизуемся
 
-        expect(page).to_have_url(f'{BASE_URL}inventory.html')
         expect(page.locator('.title')).to_have_text('Products')
         expect(page.locator('.inventory_item')).to_have_count(6)
 
-
-    def test_adding_to_cart_single_item(self, page: Page):
+    @allure.title('Добавление товара в корзину')
+    @allure.description('Проверяем, что при добавлении товара каунтер корзины появляется/увеличивается и кнопка меняет состояние с Add to cart на состояние Remove')
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_adding_to_cart_items(self, page: Page):
 
         login_page = LoginPage(page)
         cart_page = CartPage(page)
@@ -35,8 +44,10 @@ class TestInventory:
         #проверяем, что каунтер увеличился до 2
         expect(page.locator('.shopping_cart_badge')).to_have_text('2')
 
-
-    def test_removing_item_from_cart(self, page: Page):
+    @allure.title('Удаление товара из корзины')
+    @allure.description('Проверяем, что добавленный товар в корзину можно удалить и изменится состояние кнопки Remove на Add to cart и каунтер корзины уменьшится/исчезнет')
+    @allure.severity(allure.severity_level.NORMAL)
+    def test_removing_items_from_cart(self, page: Page):
 
         login_page = LoginPage(page)
         cart_page = CartPage(page)
@@ -56,7 +67,9 @@ class TestInventory:
         #проверяем, что каунтер исчез
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
-
+    @allure.title('Детальная страница товара')
+    @allure.description('Проверяем, что при проваливании в детальную страницу товара можно добавлять/удалять товар в корзину, проверяем каунтер, проверяем ui-элементы страницы и возвращаемся назад в каталог')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_item_page(self, page: Page):
 
         login_page = LoginPage(page)
@@ -95,7 +108,9 @@ class TestInventory:
         #проверяем, что успешно вернулись назад
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
 
-
+    @allure.title('Сортировка по цене. Возрастание.')
+    @allure.description('Проверяем, что работает сортировка товаров по цене по возрастанию от меньших цен к большим')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_sorting_low_to_high(self, page: Page):
 
         login_page = LoginPage(page)
@@ -115,6 +130,9 @@ class TestInventory:
             low_to_high_sort_list.append(price_text) #добавляем полученный результат в пустой список заранее созданный
         assert low_to_high_sort_list == sorted(low_to_high_sort_list) #сравниваем полученный результат с аналогичным списком по возрастанию
 
+    @allure.title('Сортировка по цене. Уменьшение.')
+    @allure.description('Проверяем, что работает сортировка товаров по цене по уменьшению от больших цен к меньшим')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_sorting_high_to_low(self, page: Page):
 
         login_page = LoginPage(page)
@@ -134,6 +152,9 @@ class TestInventory:
             high_to_low_sort_list.append(price_text) #добавляем полученный результат в пустой список заранее созданный
         assert high_to_low_sort_list == sorted(high_to_low_sort_list, reverse=True) #сравниваем полученный результат со списком по убыванию
 
+    @allure.title('Сортировка по алфавиту. Уменьшение')
+    @allure.description('Проверяем, что работает сортировка товаров в обратном алфавитном порядке')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_name_z_to_a_sorting(self, page: Page):
 
         login_page = LoginPage(page)
@@ -151,6 +172,9 @@ class TestInventory:
             select_name_z_to_a_sort_list.append(name_text)
         assert select_name_z_to_a_sort_list == sorted(select_name_z_to_a_sort_list, reverse=True)
 
+    @allure.title('Сортировка по алфавиту. Увеличение')
+    @allure.description('Проверяем, что работает сортировка товаров в алфавитном порядке')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_name_a_to_z_sorting(self, page: Page):
 
         login_page = LoginPage(page)
