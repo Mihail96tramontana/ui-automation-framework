@@ -3,8 +3,15 @@ from config import BASE_URL, PASSWORD, STANDARD_USER
 from pages.login_page import LoginPage
 from pages.cart_page import CartPage
 from pages.inventory_page import InventoryPage
+import allure
 
+
+@allure.feature('Корзина')
 class TestCart:
+
+    @allure.title('Добавление 1 товара в корзину')
+    @allure.description('Проверяем, что товар корректно добавляется в корзину, ui-элементы и возвращаемся назад в каталог через кнопку')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_add_item_in_cart(self, page: Page):
 
         #создаём объекты Page Object
@@ -33,6 +40,10 @@ class TestCart:
 
         expect(page).to_have_url(f'{BASE_URL}inventory.html') #проверяем, что при переходе в каталог попадаем именно в каталог
 
+
+    @allure.title('Удаление 1 товара из корзины (1)')
+    @allure.description('Проверяем удаление товара из корзины и изменение состояния кнопки')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_remove_item_from_cart(self, page: Page):
 
         #создаём объекты Page Object
@@ -52,6 +63,10 @@ class TestCart:
         expect(page.locator('.cart_item')).to_be_hidden()
         expect(page.locator('.shopping_cart_badge')).to_be_hidden()
 
+
+    @allure.title('Удаление 1 товара из корзины (2)')
+    @allure.description('Проверяем поведение сайта, если добавить товар в корзину - удалить - снова добавить')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_add_remove_add_item_to_cart(self, page: Page):
 
         #создаём объекты Page Object
@@ -83,6 +98,10 @@ class TestCart:
         price_text = page.locator('.inventory_item_price').nth(0)
         expect(price_text).to_have_text('$29.99')
 
+
+    @allure.title('Добавление 3 товаров в корзину')
+    @allure.description('Проверяем корректно ли добавляются несколько товаров в корзину и сверяем элементы на странице')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_add_multiple_to_cart(self, page: Page):
 
         #создаём объекты Page Object

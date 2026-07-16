@@ -2,11 +2,15 @@ from playwright.sync_api import expect, Page
 from config import BASE_URL, NAME, LAST_NAME, POSTAL_CODE
 from pages.checkout_page import CheckoutPage
 import pytest
+import allure
 
 
+@allure.title('Покупка товара')
 class TestCheckout:
 
-    #переходим на страницу заполнения формы
+    @allure.title('Страница заполнения формы при покупке')
+    @allure.description('Проверяем, что корректно переходит на страницу заполнения формы при покупке из корзины и есть необходимые ui-элементы: поля, кнопки')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_proceed_to_checkout(self, page: Page, fixture_login_add_item_checkout):
 
         #фикстура с авторизацией/добавлением 1 товара в корзину/переходом к заполнению формы при покупке
@@ -25,7 +29,9 @@ class TestCheckout:
         expect(page.locator('.title')).to_have_text('Checkout: Your Information')
 
 
-    #заполняем форму на странице Checkout: Your Information и пробуем вернуться в корзину обратно
+    @allure.title('Заполнение формы при покупке')
+    @allure.description('Проверяем заполнение формы при покупке товара и возвращаемся на страницу назад (в корзину)')
+    @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.parametrize('first_name, last_name, postal_code, expected_text_error', [
         ('','','','Error: First Name is required'),
         ('','test','test','Error: First Name is required'),
@@ -60,7 +66,9 @@ class TestCheckout:
         expect(page).to_have_url(f'{BASE_URL}cart.html')
 
 
-    #переходим со страницы заполнения формы на стр с итоговой суммой покупки и проверяем её, после чего возвращаемся в каталог (перехода в корзину нет)
+    @allure.title('Страница итоговой суммы покупки')
+    @allure.description('Переход на страницу с финальной суммой для оплаты, проверка всех элементов (корректность сумм, ui-элементы, кнопки), возвращение назад к каталогу')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_checkout_your_information_to_overview(self, page: Page, fixture_login_add_three_item_checkout):
 
         checkout_page = CheckoutPage(page)
@@ -132,7 +140,9 @@ class TestCheckout:
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
 
 
-    #переходим на финальную со стр итоговой суммы после прожатия на кнопку finish и возвращаемся в каталог обратно (перехода на стр с итоговой суммой нет)
+    @allure.title('Страница успешной оплаты')
+    @allure.description('Переход на страницу успешной оплаты со страницы итоговой суммы, проверка элементов и возвращение в каталог (перехода по кнопке на предыдущую страницу с итоговой суммы нет)')
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_checkout_overview_to_finish(self, page: Page, fixture_login_add_three_item_checkout):
 
         checkout_page = CheckoutPage(page)
@@ -163,6 +173,10 @@ class TestCheckout:
 
         expect(page).to_have_url(f'{BASE_URL}inventory.html')
 
+
+    @allure.title('Скачивание pdf-файла оплаты')
+    @allure.description('Проверка скачивания на финальной странице пдф-файла об оплате и проверка его формата')
+    @allure.severity(allure.severity_level.NORMAL)
     def test_download_pdf(self, page: Page, fixture_login_add_three_item_checkout):
 
         checkout_page = CheckoutPage(page)
