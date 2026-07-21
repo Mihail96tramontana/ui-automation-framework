@@ -5,7 +5,7 @@ import pytest
 import allure
 
 
-@allure.title('Покупка товара')
+@allure.feature('Покупка товара')
 class TestCheckout:
 
     @allure.title('Страница заполнения формы при покупке')
@@ -29,7 +29,7 @@ class TestCheckout:
         expect(page.locator('.title')).to_have_text('Checkout: Your Information')
 
 
-    @allure.title('Заполнение формы при покупке')
+    @allure.title('Заполнение формы при покупке. Параметризация')
     @allure.description('Проверяем заполнение формы при покупке товара и возвращаемся на страницу назад (в корзину)')
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.parametrize('first_name, last_name, postal_code, expected_text_error', [

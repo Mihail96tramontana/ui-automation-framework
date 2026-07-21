@@ -38,7 +38,7 @@ class TestLogin:
             expect(page.locator('h3[data-test="error"]')).to_have_text('Epic sadface: Sorry, this user has been locked out.')
 
     @allure.title('Авторизация невалидными данными')
-    @allure.description('Авторизация с некорректно заполненными полями, из-за чего юзер не должен попадать в приложение')
+    @allure.description('Авторизация с некорректно заполненными полями, из-за чего юзер не должен попадать в приложение. Параметризация')
     @allure.severity(allure.severity_level.CRITICAL)
     @pytest.mark.parametrize('username, password, error_text', [
             (STANDARD_USER, 'invalid_password', 'Epic sadface: Username and password do not match any user in this service'),
